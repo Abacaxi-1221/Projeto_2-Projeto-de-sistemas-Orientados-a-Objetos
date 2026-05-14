@@ -1,0 +1,40 @@
+@startuml Diagrama de Sequência - Ciclo de Pedido
+
+skinparam sequenceMessageAlign center
+
+actor Cliente
+participant "PedidoService" as PS
+participant "Pedido" as P
+participant "Catalogo" as C
+participant "VariacaoProduto" as VP
+
+== Busca no Catálogo ==
+Cliente -> C : buscar(filtro)
+C --> Cliente : List<Lampada>
+
+== Criação do Pedido ==
+Cliente -> PS : criarPedido("João")
+PS -> P : new Pedido(id, "João")
+PS --> Cliente : pedido [RASCUNHO]
+
+== Adição de Itens ==
+Cliente -> PS : adicionarItem(pedido, lampada, variacao, 2)
+PS -> VP : temEstoque(2)
+VP --> PS : true
+PS -> P : adicionarItem(ItemPedido)
+PS --> Cliente : item adicionado
+
+== Pagamento ==
+Cliente -> PS : confirmarPagamento(pedido)
+PS -> VP : reduzirEstoque(2)
+PS -> P : avancarStatus()
+note right of P : RASCUNHO → PAGO
+PS --> Cliente : pagamento confirmado
+
+== Envio ==
+Cliente -> PS : registrarEnvio(pedido)
+PS -> P : avancarStatus()
+note right of P : PAGO → ENVIADO
+PS --> Cliente : envio registrado
+
+@enduml

@@ -1,0 +1,36 @@
+@startuml Casos de Uso - LumináRIA
+
+left to right direction
+skinparam actorStyle awesome
+
+actor "Cliente" as C
+actor "Administrador" as A
+
+rectangle "Sistema LumináRIA" {
+
+  usecase "Visualizar Catálogo" as UC1
+  usecase "Filtrar por Lúmens/\nSoquete/Voltagem" as UC2
+  usecase "Comparar Lâmpadas\n(até 3)" as UC3
+  usecase "Criar Pedido" as UC4
+  usecase "Confirmar Pagamento" as UC5
+  usecase "Acompanhar Status\ndo Pedido" as UC6
+
+  usecase "Gerenciar Catálogo" as UC7
+  usecase "Gerenciar Estoque" as UC8
+  usecase "Registrar Envio" as UC9
+
+  UC1 <.. UC2 : <<extend>>
+  UC1 <.. UC3 : <<extend>>
+  UC4 ..> UC5 : <<include>>
+}
+
+C --> UC1
+C --> UC3
+C --> UC4
+C --> UC6
+
+A --> UC7
+A --> UC8
+A --> UC9
+
+@enduml

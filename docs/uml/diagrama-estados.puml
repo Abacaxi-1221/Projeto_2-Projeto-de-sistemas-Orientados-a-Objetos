@@ -1,0 +1,21 @@
+@startuml Diagrama de Estados - Pedido
+
+skinparam stateFontSize 14
+
+[*] --> RASCUNHO : criarPedido()
+
+RASCUNHO --> PAGO : confirmarPagamento()\n[estoque disponível]
+RASCUNHO --> CANCELADO : cancelar()
+
+PAGO --> ENVIADO : registrarEnvio()
+PAGO --> CANCELADO : cancelar()\n[estoque devolvido]
+
+ENVIADO --> [*]
+CANCELADO --> [*]
+
+RASCUNHO : Pedido em edição
+PAGO : Pagamento confirmado\nestoque reservado
+ENVIADO : Produto a caminho
+CANCELADO : Pedido encerrado
+
+@enduml

@@ -1,0 +1,143 @@
+@startuml Diagrama de Classes - LumináRIA
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 13
+
+package "model" {
+
+  abstract class Lampada {
+    - id : String
+    - nome : String
+    - marca : String
+    - lumens : int
+    - soquete : TipoSoquete
+    - variacoes : List<VariacaoProduto>
+    + getTipo() : String
+    + calcularEficiencia() : double
+    + adicionarVariacao(v : VariacaoProduto)
+    + getVariacaoPorVoltagem(v : int) : Optional
+  }
+
+  class VariacaoProduto {
+    - voltagem : int
+    - corLuz : String
+    - potenciaWatts : double
+    - estoque : int
+    - preco : BigDecimal
+    + temEstoque(qtd : int) : boolean
+    + reduzirEstoque(qtd : int)
+  }
+
+  class LedLampada {
+    - vidaUtilHoras : int
+    - dimmerizavel : boolean
+    + getTipo() : String
+    + calcularEficiencia() : double
+  }
+
+  class FluorescenteLampada {
+    - irc : int
+    - temperaturaCorK : int
+    + getTipo() : String
+    + calcularEficiencia() : double
+  }
+
+  class IncandescenteLampada {
+    - tipoGas : String
+    + getTipo() : String
+    + calcularEficiencia() : double
+  }
+
+  class SmartLampada {
+    - protocolo : String
+    - suportaRgb : boolean
+    + getTipo() : String
+    + calcularEficiencia() : double
+  }
+
+  enum TipoSoquete {
+    E27
+    E14
+    E40
+    GU10
+    G4
+  }
+
+  enum StatusPedido {
+    RASCUNHO
+    PAGO
+    ENVIADO
+    CANCELADO
+    + proximo() : StatusPedido
+  }
+}
+
+package "catalogo" {
+
+  class Catalogo {
+    - lampadas : List<Lampada>
+    + adicionar(l : Lampada)
+    + buscar(f : FiltroCatalogo) : List<Lampada>
+    + listarTodos() : List<Lampada>
+  }
+
+  class FiltroCatalogo {
+    - lumensMin : Integer
+    - lumensMax : Integer
+    - soquete : TipoSoquete
+    - voltagem : Integer
+    - tipo : String
+  }
+
+  class ComparadorLampadas {
+    + comparar(lampadas : List<Lampada>) : String
+  }
+}
+
+package "pedido" {
+
+  class Pedido {
+    - id : String
+    - cliente : String
+    - status : StatusPedido
+    - criacao : LocalDateTime
+    + adicionarItem(item : ItemPedido)
+    + avancarStatus()
+    + cancelar()
+    + getTotal() : BigDecimal
+  }
+
+  class ItemPedido {
+    - quantidade : int
+    + getSubtotal() : BigDecimal
+  }
+
+  class PedidoService {
+    + criarPedido(cliente : String) : Pedido
+    + adicionarItem(...)
+    + confirmarPagamento(p : Pedido)
+    + registrarEnvio(p : Pedido)
+  }
+}
+
+' Herança
+Lampada <|-- LedLampada
+Lampada <|-- FluorescenteLampada
+Lampada <|-- IncandescenteLampada
+Lampada <|-- SmartLampada
+
+' Composição (losango preenchido)
+Lampada *-- "1..*" VariacaoProduto : variacoes
+
+' Associações
+Catalogo o-- "0..*" Lampada
+Catalogo ..> FiltroCatalogo : usa
+ComparadorLampadas ..> Lampada : compara
+
+Pedido *-- "1..*" ItemPedido
+ItemPedido --> Lampada
+ItemPedido --> VariacaoProduto
+Pedido --> StatusPedido
+PedidoService ..> Pedido : gerencia
+
+@enduml
